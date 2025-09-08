@@ -36,7 +36,7 @@ open class MultiChoiceCheckBoxViewBuilder(final override val nFormView: NFormVie
     }
 
     override fun setViewProperties(attribute: Map.Entry<String, Any>) {
-        when (attribute.key.toUpperCase(Locale.getDefault())) {
+        when (attribute.key.uppercase(Locale.ROOT)) {
             MultiChoiceCheckBoxProperties.TEXT.name -> {
                 multiChoiceCheckBox.addView(multiChoiceCheckBox.addViewLabel(attribute.toPair()))
             }
@@ -135,5 +135,4 @@ open class MultiChoiceCheckBoxViewBuilder(final override val nFormView: NFormVie
             }
     }
 }
-
 

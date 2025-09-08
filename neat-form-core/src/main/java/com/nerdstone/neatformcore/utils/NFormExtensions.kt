@@ -144,7 +144,7 @@ fun NFormView.applyViewAttributes(
     acceptedAttributes: HashSet<String>, task: (attribute: Map.Entry<String, Any>) -> Unit
 ) {
     this.viewProperties.viewAttributes?.forEach { attribute ->
-        if (acceptedAttributes.contains(attribute.key.toUpperCase(Locale.getDefault()))) {
+        if (acceptedAttributes.contains(attribute.key.uppercase(Locale.ROOT))) {
             task(attribute)
         }
     }
@@ -196,7 +196,7 @@ fun NFormView.handleRequiredStatus() {
 fun NFormView.isFieldRequired(): Boolean {
     viewProperties.requiredStatus?.also {
         val isRequired = viewProperties.requiredStatus!!.extractKeyValue()
-            .first.toLowerCase(Locale.getDefault())
+            .first.lowercase(Locale.ROOT)
         return isRequired == "yes" || isRequired == "true"
     }
     return false

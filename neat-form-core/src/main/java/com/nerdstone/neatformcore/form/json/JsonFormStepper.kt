@@ -1,6 +1,7 @@
 package com.nerdstone.neatformcore.form.json
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -72,9 +73,10 @@ class JsonFormStepper(
             }
             neatStepperLayout.apply {
                 showLoadingIndicators(false)
+                val activity = (context as FragmentActivity)
                 setUpViewWithAdapter(
                     StepperPagerAdapter(
-                        (context as FragmentActivity).supportFragmentManager, stepFragmentsList
+                        activity.supportFragmentManager, activity.lifecycle, stepFragmentsList
                     )
                 )
             }
@@ -117,7 +119,12 @@ class StepFragment : Step {
         super.onCreate(savedInstanceState)
         arguments?.also {
             index = it.getInt(FRAGMENT_INDEX)
-            formView = it.getSerializable(FRAGMENT_VIEW) as VerticalRootView?
+            formView = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                it.getSerializable(FRAGMENT_VIEW, VerticalRootView::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                it.getSerializable(FRAGMENT_VIEW) as VerticalRootView?
+            }
         }
     }
 
@@ -135,13 +142,13 @@ class StepFragment : Step {
         formView = null
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         dataViewModel = (activity as FormActions).formBuilder.dataViewModel
         with(dataViewModel) {
-            details.observe(viewLifecycleOwner, {
+            details.observe(viewLifecycleOwner) {
                 (activity as Context).updateFieldValues(it, mutableSetOf())
-            })
+            }
         }
     }
 

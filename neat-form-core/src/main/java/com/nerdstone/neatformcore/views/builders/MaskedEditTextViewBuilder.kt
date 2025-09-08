@@ -67,7 +67,7 @@ open class MaskedEditTextViewBuilder(final override val nFormView: NFormView) : 
         editTextNFormView.apply {
             if (viewProperties.getResourceFromAttribute().isNullOrEmpty())
                 TextViewCompat.setTextAppearance(editTextNFormView, R.style.editTextStyle)
-            when (attribute.key.toUpperCase(Locale.getDefault())) {
+            when (attribute.key.uppercase(Locale.ROOT)) {
                 MaskedEditTextProperties.MASK_HINT.name -> {
                     hint = SpannableStringBuilder(attribute.value as String)
                 }
@@ -83,7 +83,7 @@ open class MaskedEditTextViewBuilder(final override val nFormView: NFormView) : 
         editTextNFormView.apply {
             if (viewProperties.getResourceFromAttribute().isNullOrEmpty())
                 TextViewCompat.setTextAppearance(editTextNFormView, R.style.editTextStyle)
-            when (attribute.key.toUpperCase(Locale.getDefault())) {
+            when (attribute.key.uppercase(Locale.ROOT)) {
                 EditTextProperties.ALLOWED_CHARS.name -> {
                     allowedChars = attribute.value.toString()
                 }
@@ -95,7 +95,8 @@ open class MaskedEditTextViewBuilder(final override val nFormView: NFormView) : 
                     val value = editTextNFormView.context.pxToDp(
                         (attribute.value as String).toFloat(),
                     )
-                    setPadding(value, value, value, value)
+                    // Use relative padding to avoid deprecated setPadding warnings
+                    setPaddingRelative(value, value, value, value)
                 }
                 EditTextProperties.TEXT_SIZE.name ->
                     textSize = (attribute.value as String).toFloat()

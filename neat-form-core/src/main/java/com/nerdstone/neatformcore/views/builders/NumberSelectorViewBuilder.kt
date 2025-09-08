@@ -45,9 +45,7 @@ open class NumberSelectorViewBuilder(final override val nFormView: NFormView) : 
 
     private fun createLabel() {
         val text = numberSelectorNFormView.viewProperties.viewAttributes?.get(
-            NumberSelectorProperties.TEXT.name.toLowerCase(
-                Locale.getDefault()
-            )
+            NumberSelectorProperties.TEXT.name.lowercase(Locale.ROOT)
         )
         numberSelectorNFormView.addView(
             numberSelectorNFormView.addViewLabel(Pair(NumberSelectorProperties.TEXT.name, text!!))
@@ -63,7 +61,7 @@ open class NumberSelectorViewBuilder(final override val nFormView: NFormView) : 
     }
 
     override fun setViewProperties(attribute: Map.Entry<String, Any>) {
-        when (attribute.key.toUpperCase(Locale.getDefault())) {
+        when (attribute.key.uppercase(Locale.ROOT)) {
             NumberSelectorProperties.FIRST_NUMBER.name -> {
                 firstNumber = attribute.value.toString().toInt()
             }
@@ -276,4 +274,3 @@ open class NumberSelectorViewBuilder(final override val nFormView: NFormView) : 
         }
     }
 }
-

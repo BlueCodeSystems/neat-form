@@ -26,7 +26,7 @@ object NFormRulesHandler : RulesHandler {
         evaluationResult: Boolean, rule: Rule?, facts: Facts?
     ) {
         if (rule != null && facts != null && !evaluationResult) {
-            if (facts.asMap().containsKey(rule.name) && rule.name.toLowerCase(Locale.getDefault())
+            if (facts.asMap().containsKey(rule.name) && rule.name.lowercase(Locale.ROOT)
                     .endsWith(Constants.RuleActions.VISIBILITY)
             ) facts.put(rule.name, false)
         }
@@ -47,7 +47,7 @@ object NFormRulesHandler : RulesHandler {
         return executableRulesList
             .map { rule -> rule.name }
             .filter {
-                it.toLowerCase(Locale.getDefault()).endsWith(suffix)
+                it.lowercase(Locale.ROOT).endsWith(suffix)
             }
     }
 

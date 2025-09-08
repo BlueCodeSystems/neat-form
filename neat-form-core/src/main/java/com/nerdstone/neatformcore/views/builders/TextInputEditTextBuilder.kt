@@ -30,7 +30,7 @@ open class TextInputEditTextBuilder(final override val nFormView: NFormView) : V
 
     override fun setViewProperties(attribute: Map.Entry<String, Any>) {
         textInputEditTextNFormView.apply {
-            when (attribute.key.toUpperCase(Locale.getDefault())) {
+            when (attribute.key.uppercase(Locale.ROOT)) {
                 TextInputEditTextViewProperties.PADDING.name -> {
                     val value = textInputEditTextNFormView.context.pxToDp(
                         (attribute.value as String).toFloat(),
@@ -46,7 +46,7 @@ open class TextInputEditTextBuilder(final override val nFormView: NFormView) : V
         }
 
         textInputEditTextNFormView.editText?.apply {
-            when (attribute.key.toUpperCase(Locale.getDefault())) {
+            when (attribute.key.uppercase(Locale.ROOT)) {
                 TextInputEditTextViewProperties.TEXT_SIZE.name ->
                     textSize = (attribute.value as String).toFloat()
 
@@ -109,5 +109,4 @@ open class TextInputEditTextBuilder(final override val nFormView: NFormView) : V
         }
     }
 }
-
 

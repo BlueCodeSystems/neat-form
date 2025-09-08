@@ -33,7 +33,7 @@ open class CheckBoxViewBuilder(final override val nFormView: NFormView) : ViewBu
         checkBoxNFormView.apply {
             if (viewProperties.getResourceFromAttribute().isNullOrEmpty())
                 TextViewCompat.setTextAppearance(checkBoxNFormView, R.style.checkBoxStyle)
-            when (attribute.key.toUpperCase(Locale.getDefault())) {
+            when (attribute.key.uppercase(Locale.ROOT)) {
                 CheckBoxProperties.TEXT.name -> {
                     text = attribute.value.toString()
                 }

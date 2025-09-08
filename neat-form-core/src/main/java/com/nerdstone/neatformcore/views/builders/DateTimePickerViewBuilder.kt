@@ -59,7 +59,7 @@ open class DateTimePickerViewBuilder(final override val nFormView: NFormView) :
 
     override fun setViewProperties(attribute: Map.Entry<String, Any>) {
         textInputEditText.apply {
-            when (attribute.key.toUpperCase(Locale.getDefault())) {
+            when (attribute.key.uppercase(Locale.ROOT)) {
                 DateTimePickerProperties.HINT.name -> {
                     hint = attribute.value.toString()
                     formatHintForRequiredFields()
@@ -185,7 +185,7 @@ open class DateTimePickerViewBuilder(final override val nFormView: NFormView) :
     open fun getDate(day: String?): Long? {
         val calendarDate = getInstance()
         if (day != null && day.trim { it <= ' ' }.isNotEmpty()) {
-            val dayString = day.trim { it <= ' ' }.toLowerCase(Locale.getDefault())
+            val dayString = day.trim { it <= ' ' }.lowercase(Locale.ROOT)
             if (TODAY != dayString) {
                 val pattern =
                     Pattern.compile("$TODAY\\s*([-\\+])\\s*(\\d+)([dmywDMYW]{1})")

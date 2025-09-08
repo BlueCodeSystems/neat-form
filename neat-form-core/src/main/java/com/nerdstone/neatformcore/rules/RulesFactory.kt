@@ -154,7 +154,7 @@ class RulesFactory : RuleListener {
     }
 
     private fun setDefaultFact(key: String, dataType: String) {
-        when (dataType.toUpperCase(Locale.getDefault())) {
+        when (dataType.uppercase(Locale.ROOT)) {
             DataTypes.BOOL.name -> facts.put(key, false)
             DataTypes.NUMBER.name -> facts.put(key, 0)
             DataTypes.TEXT.name -> facts.put(key, null)

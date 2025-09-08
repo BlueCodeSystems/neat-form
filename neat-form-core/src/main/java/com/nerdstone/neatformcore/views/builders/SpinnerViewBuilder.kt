@@ -33,7 +33,7 @@ open class SpinnerViewBuilder(final override val nFormView: NFormView) : ViewBui
 
     override fun setViewProperties(attribute: Map.Entry<String, Any>) {
         materialSpinner.apply {
-            when (attribute.key.toUpperCase(Locale.getDefault())) {
+            when (attribute.key.uppercase(Locale.ROOT)) {
                 SpinnerProperties.TEXT.name -> {
                     materialSpinner.hint = attribute.value as String
                     formatHintForRequiredFields()

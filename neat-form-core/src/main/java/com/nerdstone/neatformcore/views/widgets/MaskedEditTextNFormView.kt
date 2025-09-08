@@ -3,6 +3,7 @@ package com.nerdstone.neatformcore.views.widgets
 import android.content.Context
 import android.util.AttributeSet
 import com.nerdstone.neatformcore.R
+import androidx.core.content.ContextCompat
 import com.nerdstone.neatformcore.domain.listeners.DataActionListener
 import com.nerdstone.neatformcore.domain.listeners.VisibilityChangeListener
 import com.nerdstone.neatformcore.domain.model.NFormViewDetails
@@ -33,7 +34,7 @@ class MaskedEditTextNFormView : MaskedEditText, NFormView {
         setPrimaryColor(R.color.colorBlack)
         isFloatingLabelAlwaysShown = true
         floatingLabelTextSize = resources.getDimension(R.dimen.default_text_size).toInt()
-        floatingLabelTextColor = resources.getColor(R.color.colorBlack)
+        floatingLabelTextColor = ContextCompat.getColor(context, R.color.colorBlack)
         focusFraction=1F
         setMetHintTextColor(R.color.colorBlack)
         invalidate()
@@ -68,11 +69,11 @@ class MaskedEditTextNFormView : MaskedEditText, NFormView {
             this.error = validationPair.second
             error = validationPair.second
             isAutoValidate = true
-            errorColor = resources.getColor(R.color.colorRed)
-            floatingLabelTextColor = resources.getColor(R.color.colorRed)
+            errorColor = ContextCompat.getColor(context, R.color.colorRed)
+            floatingLabelTextColor = ContextCompat.getColor(context, R.color.colorRed)
         } else {
             this.error = null
-            floatingLabelTextColor = resources.getColor(R.color.colorBlack)
+            floatingLabelTextColor = ContextCompat.getColor(context, R.color.colorBlack)
         }
         return validationPair.first
     }

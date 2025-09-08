@@ -46,7 +46,7 @@ open class EditTextViewBuilder(final override val nFormView: NFormView) : ViewBu
             if (viewProperties.getResourceFromAttribute().isNullOrEmpty())
                 TextViewCompat.setTextAppearance(editTextNFormView, R.style.editTextStyle)
 
-            when (attribute.key.toUpperCase(Locale.getDefault())) {
+            when (attribute.key.uppercase(Locale.ROOT)) {
                 EditTextProperties.HINT.name -> {
                     hint = SpannableStringBuilder(attribute.value as String)
                     formatHintForRequiredFields()

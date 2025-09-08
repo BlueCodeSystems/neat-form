@@ -69,24 +69,24 @@ open class NotificationViewBuilder(final override val nFormView: NFormView) : Vi
         //Set current title and text and highlighted text color from the view attributes. Title can be null
         currentViewProps?.also {
             currentTitle =
-                it[NotificationProperties.TITLE.name.toLowerCase(Locale.getDefault())].toString()
+                it[NotificationProperties.TITLE.name.lowercase(Locale.ROOT)].toString()
             currentText =
-                it[NotificationProperties.TEXT.name.toLowerCase(Locale.getDefault())].toString()
+                it[NotificationProperties.TEXT.name.lowercase(Locale.ROOT)].toString()
             val highlightedTextColorHex =
-                NotificationProperties.HIGHLIGHTED_TEXT_COLOR.name.toLowerCase(Locale.getDefault())
+                NotificationProperties.HIGHLIGHTED_TEXT_COLOR.name.lowercase(Locale.ROOT)
             if (it.containsKey(highlightedTextColorHex))
                 highlightedTextColor = Color.parseColor(it[highlightedTextColorHex].toString())
         }
         val notificationType =
             currentViewProps?.get(
-                NotificationProperties.NOTIFICATION_TYPE.name.toLowerCase(Locale.getDefault())
+                NotificationProperties.NOTIFICATION_TYPE.name.lowercase(Locale.ROOT)
             ).toString()
         setupNotificationType(notificationType)
         nFormView.applyViewAttributes(acceptedAttributes, this::setViewProperties)
     }
 
     override fun setViewProperties(attribute: Map.Entry<String, Any>) {
-        when (attribute.key.toUpperCase(Locale.getDefault())) {
+        when (attribute.key.uppercase(Locale.ROOT)) {
             NotificationProperties.DISMISSIBLE.name -> {
                 notificationCancelIcon.apply {
                     if (attribute.value.toString() == "true" || attribute.value.toString() == "yes")
@@ -142,9 +142,9 @@ open class NotificationViewBuilder(final override val nFormView: NFormView) : Vi
     private fun getDialogTitleAndText(): Pair<String, String> =
         Pair(
             currentViewProps?.get(
-                NotificationProperties.NOTIFICATION_DIALOG_TITLE.name.toLowerCase(Locale.getDefault())
+                NotificationProperties.NOTIFICATION_DIALOG_TITLE.name.lowercase(Locale.ROOT)
             ).toString(), currentViewProps?.get(
-                NotificationProperties.NOTIFICATION_DIALOG_TEXT.name.toLowerCase(Locale.getDefault())
+                NotificationProperties.NOTIFICATION_DIALOG_TEXT.name.lowercase(Locale.ROOT)
             ).toString()
         )
 
