@@ -1,5 +1,6 @@
 <!-- JITPACK BADGES:START -->
 [![JitPack Latest](https://jitpack.io/v/BlueCodeSystems/neat-form.svg)](https://jitpack.io/#BlueCodeSystems/neat-form)
+[![Build for latest tag (v1.1.6)](https://jitpack.io/v/BlueCodeSystems/neat-form/v1.1.6.svg)](https://jitpack.io/#BlueCodeSystems/neat-form/v1.1.6)
 [![master-SNAPSHOT](https://jitpack.io/v/BlueCodeSystems/neat-form/master-SNAPSHOT.svg)](https://jitpack.io/#BlueCodeSystems/neat-form/master-SNAPSHOT)
 <!-- JITPACK BADGES:END -->
 
