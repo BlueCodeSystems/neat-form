@@ -15,7 +15,7 @@ import com.nerdstone.neatformcore.form.json.JsonFormBuilder
 import com.nerdstone.neatformcore.form.json.JsonFormStepper
 import com.nerdstone.neatformcore.utils.createAlertDialog
 import com.nerdstone.neatformcore.utils.populateResourceMap
-import kotlinx.android.synthetic.main.activity_stepper.*
+import com.nerdstone.neatandroidstepper.core.widget.NeatStepperLayout
 import timber.log.Timber
 
 class StepperActivity : AppCompatActivity(), FormActions {
@@ -30,6 +30,7 @@ class StepperActivity : AppCompatActivity(), FormActions {
 
         if (filePath == null) throw NullPointerException("Filepath cannot be null")
 
+        val neatStepperLayout = findViewById<NeatStepperLayout>(R.id.neatStepperLayout)
         neatStepperLayout.apply {
             stepperActions = this@StepperActivity
             stepperModel = StepperModel.Builder()

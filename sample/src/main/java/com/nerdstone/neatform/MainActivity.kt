@@ -12,7 +12,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.nerdstone.neatform.form.FormActivity
 import com.nerdstone.neatform.form.FormData
 import com.nerdstone.neatform.form.FormRecyclerAdapter
-import kotlinx.android.synthetic.main.activity_main.*
 
 object FormType {
     const val jsonFromEmbeddedDefault = "JsonFormEmbedded - default"
@@ -100,7 +99,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             startActivity(intent)
         }
 
-        newFormFab.setOnClickListener(this)
+        floatingActionButton.setOnClickListener(this)
         exitAppImageView.setOnClickListener(this)
     }
 
