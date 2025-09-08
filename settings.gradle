@@ -1,2 +1,26 @@
+pluginManagement {
+  repositories {
+    mavenLocal()
+    google()
+    mavenCentral()
+    gradlePluginPortal()
+  }
+  plugins {
+    id 'com.android.application' version '8.6.0'
+    id 'com.android.library'     version '8.6.0'
+    id 'org.jetbrains.kotlin.android' version '1.9.24'
+  }
+}
+
 include ':sample', ':neat-form-core'
 rootProject.name='neat-form'
+
+// Optional: local composite builds for sibling projects when enabled
+def sibling = { String p -> file(p)?.exists() }
+def useLocalSiblings = (gradle.startParameter.projectProperties['useLocalSiblings']
+  ?: System.getenv('USE_LOCAL_SIBLINGS'))?.toString()?.toBoolean() ?: false
+
+// Example (disabled by default). Add entries here if you keep local siblings.
+if (useLocalSiblings && sibling('../opensrp-client-core')) {
+  includeBuild('../opensrp-client-core')
+}

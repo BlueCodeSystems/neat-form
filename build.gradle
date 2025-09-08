@@ -1,40 +1,58 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
-apply plugin: "com.vanniktech.android.junit.jacoco"
-
-buildscript {
-
-    ext.kotlin_version = '1.6.20'
-
-    repositories {
-        mavenLocal()
-        google()
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.3'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "com.vanniktech:gradle-android-junit-jacoco-plugin:0.15.0"
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
-    }
+plugins {
+  id 'com.android.application' version '8.6.0' apply false
+  id 'com.android.library'     version '8.6.0' apply false
+  id 'org.jetbrains.kotlin.android' version '1.9.24' apply false
+  id 'io.codearte.nexus-staging' version '0.30.0'
 }
 
 allprojects {
-    repositories {
-        google()
-        jcenter()
-        mavenCentral()
-        mavenLocal()
-        maven { url "https://jitpack.io" }
-    }
+  group = findProperty('GROUP') ?: 'org.smartregister'
+  version = findProperty('VERSION_NAME') ?: '0.0.1-SNAPSHOT'
 
-    tasks.withType(Javadoc) {
-        excludes = ['**/*.kt'] // < ---- Exclude all kotlin files from javadoc file.
-    }
+  repositories {
+    mavenLocal()
+    google()
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://cloudant.github.io/cloudant-sync-eap/repository' }
+    maven { url 'https://s3.amazonaws.com/repo.commonsware.com' }
+    maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+  }
+
+  // Keep JDK 17 tests stable with reflective opens
+  tasks.withType(Test).configureEach { t ->
+    maxParallelForks = 1
+    forkEvery = 0
+    jvmArgs(
+      '--add-opens=java.base/java.lang=ALL-UNNAMED',
+      '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED',
+      '--add-opens=java.base/java.io=ALL-UNNAMED',
+      '--add-opens=java.base/java.net=ALL-UNNAMED',
+      '--add-opens=java.base/java.util=ALL-UNNAMED',
+      '--add-opens=java.base/java.text=ALL-UNNAMED',
+      '--add-opens=java.base/java.security=ALL-UNNAMED',
+      '--add-opens=java.base/jdk.internal.reflect=ALL-UNNAMED',
+      '--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED',
+      '--add-opens=java.base/jdk.internal.util=ALL-UNNAMED',
+      '--add-opens=java.base/sun.nio.ch=ALL-UNNAMED',
+      '--add-opens=java.base/sun.security.util=ALL-UNNAMED',
+      '--add-opens=java.desktop/java.awt.font=ALL-UNNAMED',
+      '--add-exports=java.base/jdk.internal.reflect=ALL-UNNAMED'
+    )
+  }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+// Give JavaCompile more heap (useful for KAPT/annotation processing if present)
+allprojects {
+  tasks.withType(JavaCompile).configureEach {
+    options.fork = true
+    options.forkOptions.memoryMaximumSize = '2048m'
+  }
 }
 
+nexusStaging {
+  serverUrl = "https://s01.oss.sonatype.org/service/local/"
+}
+
+tasks.register('clean', Delete) { delete rootProject.buildDir }

@@ -1,229 +1,149 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'maven-publish'
-
-jacoco {
-    toolVersion = "0.8.5"
+plugins {
+  id 'jacoco'
+  id 'com.android.library'
+  id 'org.jetbrains.kotlin.android'
 }
 
-def properties = new Properties()
-properties.load(new FileInputStream(rootProject.file("local.properties")))
+jacoco { toolVersion = '0.8.10' }
 
-version = "1.1.5"
+version = findProperty('VERSION_NAME') ?: "1.1.5"
 
 android {
-    compileSdkVersion 32
+  namespace 'com.nerdstone.neatformcore'
+  compileSdkVersion 35
+  buildToolsVersion '35.0.0'
 
-    defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 32
-        versionCode 1
-        versionName this.version
-        multiDexEnabled true
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables.useSupportLibrary = true
+  defaultConfig {
+    minSdk 21
+    targetSdkVersion 35
+    versionCode Integer.parseInt(project.findProperty('VERSION_CODE') ?: '1')
+    versionName project.findProperty('VERSION_NAME') ?: version
+    multiDexEnabled true
+    testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+    vectorDrawables { useSupportLibrary true }
+  }
+
+  buildFeatures { buildConfig true }
+
+  // Keep Java 8 language level for Android bytecode; build uses JDK 17
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+  kotlinOptions { jvmTarget = JavaVersion.VERSION_1_8.toString() }
+
+  lint { abortOnError false }
+
+  buildTypes {
+    debug { testCoverageEnabled true }
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
     }
+  }
 
-    // Keep the following configuration in order to target Java 8.
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
-    }
+  packaging { resources { excludes += [
+    'LICENSE.txt', 'META-INF/LICENSE', 'META-INF/LICENSE.txt', 'META-INF/license.txt',
+    'META-INF/NOTICE.txt', 'META-INF/notice.txt', 'META-INF/ASL2.0', 'META-INF/INDEX.LIST'
+  ] } }
 
-    lintOptions {
-        abortOnError false
-    }
-
-    buildTypes {
-
-        debug {
-            testCoverageEnabled true
+  testOptions {
+    unitTests {
+      includeAndroidResources = true
+      returnDefaultValues = true
+      all {
+        jacoco {
+          includeNoLocationClasses = true
+          excludes = ['jdk.internal.*']
         }
-
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
+        jvmArgs(
+          '--add-opens=java.base/java.lang=ALL-UNNAMED',
+          '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED',
+          '--add-opens=java.base/java.io=ALL-UNNAMED',
+          '--add-opens=java.base/java.net=ALL-UNNAMED',
+          '--add-opens=java.base/java.util=ALL-UNNAMED',
+          '--add-opens=java.base/java.text=ALL-UNNAMED',
+          '--add-opens=java.base/java.security=ALL-UNNAMED',
+          '--add-opens=java.base/jdk.internal.reflect=ALL-UNNAMED',
+          '--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED',
+          '--add-opens=java.base/jdk.internal.util=ALL-UNNAMED',
+          '--add-opens=java.base/sun.nio.ch=ALL-UNNAMED',
+          '--add-opens=java.base/sun.security.util=ALL-UNNAMED',
+          '--add-opens=java.desktop/java.awt.font=ALL-UNNAMED',
+          '--add-exports=java.base/jdk.internal.reflect=ALL-UNNAMED'
+        )
+        systemProperty 'robolectric.dependency.repo.url', 'https://repo1.maven.org/maven2'
+        systemProperty 'robolectric.enabledSdks', '28'
+      }
     }
+  }
+}
 
-    testOptions {
-        unitTests {
-            includeAndroidResources = true
-            unitTests.returnDefaultValues = true
-        }
-        unitTests.all {
-            jacoco {
-                includeNoLocationClasses = true
-                excludes = ['jdk.internal.*']
-            }
-            jvmArgs '-noverify'
-        }
-    }
+tasks.withType(Test).configureEach {
+  jacoco {
+    includeNoLocationClasses = true
+    excludes = ['jdk.internal.*']
+  }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-    implementation 'androidx.multidex:multidex:2.0.1'
-    implementation "androidx.core:core-ktx:1.8.0"
-    implementation "androidx.appcompat:appcompat:1.4.2"
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'org.apache.commons:commons-text:1.9'
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
-    implementation 'com.google.android.material:material:1.6.1'
-    implementation 'com.jakewharton.timber:timber:5.0.1'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1'
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1"
+  implementation fileTree(dir: 'libs', include: ['*.jar'])
+  implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.24'
+  implementation 'org.jetbrains.kotlin:kotlin-reflect:1.9.24'
+  implementation 'androidx.multidex:multidex:2.0.1'
+  implementation 'androidx.core:core-ktx:1.13.1'
+  implementation 'androidx.appcompat:appcompat:1.6.1'
+  implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+  implementation 'org.apache.commons:commons-text:1.10.0'
+  implementation 'androidx.recyclerview:recyclerview:1.3.2'
+  implementation 'com.google.android.material:material:1.12.0'
+  implementation 'com.jakewharton.timber:timber:5.0.1'
+  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
+  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 
-    //Breaking changes from version 4.0+
-    implementation "org.jeasy:easy-rules-core:3.3.0"
-    implementation "org.jeasy:easy-rules-mvel:3.3.0"
-    implementation "com.google.code.gson:gson:2.9.0"
-    implementation "com.github.chivorns:smartmaterialspinner:1.2.1"
-    implementation ('io.github.softmedtanzania:maskededittext:1.0.5'){
-        transitive = true
-        exclude group: 'androidx.appcompat', module: 'appcompat'
-    }
-    api("com.nerdstone:neat-android-stepper:1.0.6") {
-        transitive = true
-        exclude group: 'androidx.appcompat', module: 'appcompat'
-        exclude group: 'androidx.constraintlayout', module: 'constraintlayout'
-    }
+  // Breaking changes from version 4.0+
+  implementation 'org.jeasy:easy-rules-core:3.3.0'
+  implementation 'org.jeasy:easy-rules-mvel:3.3.0'
+  implementation 'com.google.code.gson:gson:2.9.0'
+  implementation 'com.github.chivorns:smartmaterialspinner:1.2.1'
+  implementation ('io.github.softmedtanzania:maskededittext:1.0.5') {
+    transitive = true
+    exclude group: 'androidx.appcompat', module: 'appcompat'
+  }
+  api('com.github.BlueCodeSystems:neat-stepper:v1.0.6') {
+    transitive = true
+    exclude group: 'androidx.appcompat', module: 'appcompat'
+    exclude group: 'androidx.constraintlayout', module: 'constraintlayout'
+  }
 
-    testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.robolectric:robolectric:4.7.3'
-    testImplementation "org.robolectric:shadows-multidex:4.4"
-    debugImplementation 'androidx.fragment:fragment-testing:1.5.0'
+  testImplementation 'junit:junit:4.13.2'
+  testImplementation 'org.robolectric:robolectric:4.10.3'
+  debugImplementation 'androidx.fragment:fragment-testing:1.6.2'
+  testImplementation 'androidx.test:core:1.5.0'
+  testImplementation 'io.mockk:mockk:1.13.10'
+  testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'
 
-    testImplementation 'androidx.test:core:1.4.0'
-    testImplementation "io.mockk:mockk:1.12.3"
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.1'
-
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-
-    // debugImplementation because LeakCanary should only run in debug builds.
-   // debugImplementation "com.squareup.leakcanary:leakcanary-android:2.3"
+  androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+  androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
 
-repositories {
-    mavenCentral()
+repositories { mavenCentral() }
+
+// Jacoco aggregated report
+tasks.register('jacocoTestReport', JacocoReport) {
+  dependsOn 'testDebugUnitTest'
+  reports {
+    xml.required = true; html.required = true
+    xml.outputLocation = file("${buildDir}/reports/jacoco/jacocoRootReport/merged.xml")
+    html.outputLocation = file("${buildDir}/reports/jacoco/jacocoRootReport/html")
+  }
+  def fileFilter = ['**/R.class','**/R$*.class','**/BuildConfig.*','**/Manifest*.*','**/*Test*.*','android/**/*.*','**/*$ViewBinder*.*']
+  def debugTree = fileTree(dir: "$buildDir/intermediates/javac/debug/classes", excludes: fileFilter)
+  def mainSrc = "$project.projectDir/src/main/java"
+  sourceDirectories.setFrom(files([mainSrc]))
+  classDirectories.setFrom(files([debugTree]))
+  executionData.setFrom(fileTree(dir: buildDir, includes: ['jacoco/testDebugUnitTest.exec', 'outputs/code-coverage/connected/*coverage.ec']))
 }
 
-def getArtifactId = { ->
-    return "neat-form-core"
-}
 
-task androidJavadocs(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    android.libraryVariants.all { variant ->
-        if (variant.name == 'release') {
-            if (variant.hasProperty('javaCompileProvider')) {
-                // Android 3.3.0+
-                owner.classpath += variant.javaCompileProvider.get().classpath
-            } else {
-                owner.classpath += variant.javaCompile.classpath
-            }
-        }
-    }
-    exclude '**/R.html', '**/R.*.html', '**/index.html'
-}
-
-task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
-    archiveClassifier.set('javadoc')
-    from androidJavadocs.destinationDir
-}
-
-task androidSourcesJar(type: Jar) {
-    archiveClassifier.set('sources')
-    from android.sourceSets.main.java.srcDirs
-}
-
-publishing {
-    publications {
-        NeatForm(MavenPublication) {
-            groupId 'com.nerdstone'
-            artifactId getArtifactId()
-            version this.version
-            artifact("$buildDir/outputs/aar/${getArtifactId()}-release.aar")
-            artifact androidJavadocsJar
-            artifact androidSourcesJar
-
-            pom {
-                name = 'Neat Form'
-                description = 'Build basic Android UI using JSON schema. Generate repetitive views with different configurations in easy steps.'
-                url = 'https://github.com/ellykits/neat-form'
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-            }
-            //Refer to this gist https://gist.github.com/Robyer/a6578e60127418b380ca133a1291f017
-            pom.withXml {
-                final dependenciesNode = asNode().appendNode('dependencies')
-
-                ext.addDependency = { dep, String scope ->
-                    if (dep.group == null || dep.version == null || dep.name == null || dep.name == "unspecified")
-                        return // ignore invalid dependencies
-
-                    final dependencyNode = dependenciesNode.appendNode('dependency')
-                    dependencyNode.appendNode('groupId', dep.group)
-                    dependencyNode.appendNode('artifactId', dep.name)
-                    dependencyNode.appendNode('version', dep.version)
-                    dependencyNode.appendNode('scope', scope)
-
-                    if (!dep.transitive) {
-                        // If this dependency is not transitive, we should force exclude all its dependencies from the POM
-                        final exclusionNode = dependencyNode.appendNode('exclusions').appendNode('exclusion')
-                        exclusionNode.appendNode('groupId', '*')
-                        exclusionNode.appendNode('artifactId', '*')
-                    } else if (!dep.properties.excludeRules.empty) {
-                        // Otherwise add specified exclude rules
-                        final exclusionsNode = dependencyNode.appendNode('exclusions')
-                        dep.properties.excludeRules.each { rule ->
-                            final exclusionNode = exclusionsNode.appendNode('exclusion')
-                            exclusionNode.appendNode('groupId', rule.group ?: '*')
-                            exclusionNode.appendNode('artifactId', rule.module ?: '*')
-                        }
-                    }
-                }
-
-                // List all "implementation" dependencies (for old Gradle)
-                configurations.implementation.getDependencies().each { dep -> addDependency(dep, "implementation") }
-                // List all "api" dependencies (for new Gradle) as "implementation" dependencies
-                configurations.api.getDependencies().each { dep -> addDependency(dep, "implementation") }
-                // List all "implementation" dependencies (for new Gradle) as "runtime" dependencies
-                configurations.implementation.getDependencies().each { dep -> addDependency(dep, "runtime") }
-            }
-        }
-    }
-
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            /**
-             * Configure path of the package repository on Github using the GITHUB_USER_ID and
-             * Git Repository
-             */
-            url = uri("https://maven.pkg.github.com/ellykits/neat-form")
-            credentials {
-                /** get credentials from local.properties in root project folder file with
-                 ** gpr.usr=GITHUB_USER_ID & gpr.key=PERSONAL_ACCESS_TOKEN otherwise
-                 ** Set env variable GPR_USER & GPR_API_KEY**/
-
-                username = properties['gpr.usr'] ?: System.getenv("GPR_USER")
-                password = properties['gpr.key'] ?: System.getenv("GPR_API_KEY")
-            }
-        }
-    }
-}
+apply from: '../maven.gradle'

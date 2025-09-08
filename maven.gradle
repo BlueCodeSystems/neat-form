@@ -1,0 +1,95 @@
+import org.gradle.api.tasks.bundling.Zip
+
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+def isReleaseBuild() { !version.toString().contains('SNAPSHOT') }
+def getRepositoryUsername() { hasProperty('sonatypeUsername') ? sonatypeUsername : '' }
+def getRepositoryPassword() { hasProperty('sonatypePassword') ? sonatypePassword : '' }
+def isSkipSigning() { hasProperty('skipSigning') && project.property('skipSigning').toString() == 'true' }
+
+android { publishing { singleVariant('release') { withSourcesJar(); withJavadocJar() } } }
+
+afterEvaluate {
+  publishing {
+    publications {
+      maven(MavenPublication) {
+        from components.release
+        artifactId = POM_SETTING_ARTIFACT_ID
+        pom {
+          name = POM_SETTING_NAME
+          packaging = POM_SETTING_PACKAGING
+          description = POM_SETTING_DESCRIPTION
+          url = POM_SETTING_URL
+          scm { url = POM_SETTING_SCM_URL; connection = POM_SETTING_SCM_CONNECTION; developerConnection = POM_SETTING_SCM_DEV_CONNECTION }
+          licenses { license { name = POM_SETTING_LICENCE_NAME; url = POM_SETTING_LICENCE_URL; distribution = POM_SETTING_LICENCE_DIST } }
+          developers { developer { id = POM_SETTING_DEVELOPER_ID; name = POM_SETTING_DEVELOPER_NAME } }
+        }
+      }
+    }
+    repositories {
+      if (project.hasProperty('centralBundle') && project.property('centralBundle').toString() == 'true') {
+        maven { name = 'CentralBundle'; url = layout.buildDirectory.dir('central-bundle') }
+      } else {
+        maven {
+          def sonatypeRepositoryURL = isReleaseBuild() ?
+            'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/' :
+            'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+          url = uri(sonatypeRepositoryURL)
+          credentials { username = getRepositoryUsername(); password = getRepositoryPassword() }
+        }
+      }
+    }
+  }
+  signing {
+    if (!isSkipSigning()) {
+      if (project.hasProperty('useGpgCmd') && project.property('useGpgCmd').toString() == 'true') { useGpgCmd() }
+      required {
+        isReleaseBuild() && (
+          gradle.taskGraph.hasTask(':publish') ||
+          gradle.taskGraph.hasTask(':publishToMavenLocal') ||
+          gradle.taskGraph.allTasks.any { it.name.toLowerCase().contains('publish') }
+        )
+      }
+      sign publishing.publications.maven
+    } else {
+      logger.lifecycle('Signing skipped (-PskipSigning=true)')
+    }
+  }
+  tasks.register('packageReleaseZip', Zip) {
+    group = 'distribution'
+    description = 'Packages release AAR, POM, sources and javadoc into a zip'
+    dependsOn 'assembleRelease', 'sourcesJar', 'javadocJar', 'generatePomFileForMavenPublication'
+    from("$buildDir/outputs/aar") { include '*-release.aar' }
+    from("$buildDir/publications/maven") { include 'pom-default.xml'; into('maven') }
+    from("$buildDir/libs") { include '*-sources.jar', '*-javadoc.jar' }
+    def artifactId = project.findProperty('POM_SETTING_ARTIFACT_ID') ?: project.name
+    def versionName = (project.version?.toString()) ?: (project.findProperty('VERSION_NAME') ?: 'unspecified')
+    archiveBaseName.set(artifactId)
+    archiveVersion.set(versionName)
+    destinationDirectory.set(file("$buildDir/releasePackage"))
+  }
+  tasks.register('generateCentralBundleChecksums') {
+    group = 'publishing'; description = 'Generates SHA-256 and SHA-512 checksums for the Central bundle'
+    doLast {
+      def bundleDir = layout.buildDirectory.dir('central-bundle').get().asFile
+      if (!bundleDir.exists()) { logger.lifecycle("Central bundle directory not found: ${bundleDir}"); return }
+      bundleDir.eachFileRecurse { f -> if (f.isFile()) { ['SHA-256':'sha256','SHA-512':'sha512'].each { alg, ext ->
+        def d = java.security.MessageDigest.getInstance(alg)
+        f.withInputStream { is -> byte[] buf = new byte[8192]; int r; while ((r = is.read(buf)) != -1) d.update(buf, 0, r) }
+        new File(f.parentFile, f.name+".${ext}").text = d.digest().collect { String.format('%02x', it) }.join()
+      } } }
+      logger.lifecycle('Checksums generated')
+    }
+  }
+  tasks.register('zipCentralBundle', Zip) {
+    group = 'publishing'; description = 'Zips the Central bundle directory for manual upload'
+    dependsOn 'generateCentralBundleChecksums'
+    def artifactId = project.findProperty('POM_SETTING_ARTIFACT_ID') ?: project.name
+    def versionName = (project.version?.toString()) ?: (project.findProperty('VERSION_NAME') ?: 'unspecified')
+    archiveFileName.set("central-bundle-${artifactId}-${versionName}.zip")
+    from(layout.buildDirectory.dir('central-bundle'))
+    destinationDirectory.set(file("$buildDir/distributions"))
+  }
+}
+
