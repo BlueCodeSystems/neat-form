@@ -1,3 +1,8 @@
+<!-- JITPACK BADGES:START -->
+[![JitPack Latest](https://jitpack.io/v/BlueCodeSystems/neat-form.svg)](https://jitpack.io/#BlueCodeSystems/neat-form)
+[![master-SNAPSHOT](https://jitpack.io/v/BlueCodeSystems/neat-form/master-SNAPSHOT.svg)](https://jitpack.io/#BlueCodeSystems/neat-form/master-SNAPSHOT)
+<!-- JITPACK BADGES:END -->
+
   
 # Neat Form  
   
