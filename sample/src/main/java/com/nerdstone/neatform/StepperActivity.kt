@@ -17,6 +17,10 @@ import com.nerdstone.neatformcore.utils.createAlertDialog
 import com.nerdstone.neatformcore.utils.populateResourceMap
 import com.nerdstone.neatandroidstepper.core.widget.NeatStepperLayout
 import timber.log.Timber
+import androidx.core.view.WindowCompat
+import android.util.TypedValue
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 
 class StepperActivity : AppCompatActivity(), FormActions {
 
@@ -24,7 +28,28 @@ class StepperActivity : AppCompatActivity(), FormActions {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Edge-to-edge so content can manage insets itself
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_stepper)
+        // Apply status + nav bar insets to root layout with extra top padding for comfort
+        val root = findViewById<android.view.View>(R.id.neatStepperLayout)
+        val baseStart = root.paddingLeft
+        val baseTop = root.paddingTop
+        val baseEnd = root.paddingRight
+        val baseBottom = root.paddingBottom
+        ViewCompat.setOnApplyWindowInsetsListener(root) { v, insets ->
+            val sysBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val extraTop = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 8f, resources.displayMetrics
+            ).toInt()
+            v.setPadding(
+                baseStart,
+                baseTop + sysBars.top + extraTop,
+                baseEnd,
+                baseBottom + sysBars.bottom
+            )
+            insets
+        }
         val filePath = intent?.extras?.getString(FILE_PATH)
         val preFilled = intent?.extras?.getBoolean(PRE_FILLED, false)
 

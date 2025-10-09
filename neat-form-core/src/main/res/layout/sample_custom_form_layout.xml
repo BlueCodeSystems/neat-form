@@ -7,7 +7,7 @@
     <LinearLayout
         android:id="@+id/layout_age"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -54,7 +54,7 @@
 
     <com.nerdstone.neatformcore.views.widgets.SpinnerNFormView
         android:id="@+id/gender"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="@+id/email_subscription"

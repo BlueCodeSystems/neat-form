@@ -17,6 +17,10 @@ import com.nerdstone.neatformcore.domain.builders.FormBuilder
 import com.nerdstone.neatformcore.form.json.JsonFormBuilder
 import com.nerdstone.neatformcore.form.json.JsonFormEmbedded
 import timber.log.Timber
+import androidx.core.view.WindowCompat
+import android.util.TypedValue
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 
 const val FILE_PATH = "FILE_PATH"
 const val PRE_FILLED = "PRE_FILLED"
@@ -33,6 +37,8 @@ class FormActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Edge-to-edge; we handle insets on views
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.form_activity)
 
         mainLayout = findViewById(R.id.mainLayout)
@@ -96,5 +102,19 @@ class FormActivity : AppCompatActivity() {
             putExtra(FILE_PATH, filePath)
             putExtra(PRE_FILLED, preFilled)
         })
+        // Add status bar top inset to toolbar to avoid crowding with time/date
+        val baseStart = sampleToolBar.paddingLeft
+        val baseTop = sampleToolBar.paddingTop
+        val baseEnd = sampleToolBar.paddingRight
+        val baseBottom = sampleToolBar.paddingBottom
+        ViewCompat.setOnApplyWindowInsetsListener(sampleToolBar) { v, insets ->
+            val sysBars = insets.getInsets(WindowInsetsCompat.Type.statusBars())
+            val extraTop = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 8f, resources.displayMetrics
+            ).toInt()
+            v.setPadding(baseStart, baseTop + sysBars.top + extraTop, baseEnd, baseBottom)
+            insets
+        }
+
     }
 }

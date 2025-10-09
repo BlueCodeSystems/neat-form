@@ -134,7 +134,10 @@ class StepFragment : Step {
         if (formView.isNotNull() && formView?.parent.isNotNull()) {
             return formView?.parent as View
         }
-        return ScrollView(activity).apply { addView(formView) }
+        return ScrollView(activity).apply {
+            isFillViewport = true
+            addView(formView)
+        }
     }
 
     override fun onDestroy() {
@@ -144,6 +147,7 @@ class StepFragment : Step {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // (reverted) Don't force status bar appearance here; defer to host app
         dataViewModel = (activity as FormActions).formBuilder.dataViewModel
         with(dataViewModel) {
             details.observe(viewLifecycleOwner) {

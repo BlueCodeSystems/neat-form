@@ -10,6 +10,10 @@ android {
   namespace 'com.nerdstone.neatform'
   compileSdkVersion 35
   buildToolsVersion '35.0.0'
+  buildFeatures {
+    // Ensure BuildConfig is generated for Kotlin usage
+    buildConfig true
+  }
   defaultConfig {
     applicationId 'com.nerdstone.neatform'
     minSdk 21
@@ -31,6 +35,10 @@ android {
     sourceCompatibility JavaVersion.VERSION_1_8
     targetCompatibility JavaVersion.VERSION_1_8
     coreLibraryDesugaringEnabled true
+  }
+  kotlinOptions {
+    // Align Kotlin bytecode target with Java 8 to avoid mismatch
+    jvmTarget = JavaVersion.VERSION_1_8.toString()
   }
   lint { abortOnError false ; checkReleaseBuilds false }
   packaging { resources { excludes += ['META-INF/DEPENDENCIES*','META-INF/LICENSE*','META-INF/NOTICE*','META-INF/INDEX.LIST','LICENSE.txt','META-INF/AL2.0','META-INF/LGPL2.1'] } }

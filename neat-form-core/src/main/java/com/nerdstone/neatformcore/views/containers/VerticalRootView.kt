@@ -3,6 +3,8 @@ package com.nerdstone.neatformcore.views.containers
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.nerdstone.neatformcore.domain.builders.FormBuilder
 import com.nerdstone.neatformcore.domain.model.NFormViewProperty
 import com.nerdstone.neatformcore.domain.view.NFormView
@@ -13,9 +15,27 @@ import com.nerdstone.neatformcore.utils.pxToDp
 class VerticalRootView : LinearLayout, RootView {
 
     override lateinit var formBuilder: FormBuilder
+    private var insetsApplied = false
+    private var baseStart = 0
+    private var baseTop = 0
+    private var baseEnd = 0
+    private var baseBottom = 0
 
     init {
         orientation = VERTICAL
+        // Apply system bar insets once to avoid crowding status/nav bars
+        baseStart = paddingLeft
+        baseTop = paddingTop
+        baseEnd = paddingRight
+        baseBottom = paddingBottom
+        ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
+            if (!insetsApplied) {
+                val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                v.setPadding(baseStart, baseTop + bars.top, baseEnd, baseBottom + bars.bottom)
+                insetsApplied = true
+            }
+            insets
+        }
     }
 
     constructor(context: Context) : super(context)
